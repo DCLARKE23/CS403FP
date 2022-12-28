@@ -129,6 +129,14 @@ class Rover():
         for row in self.map:
             print(*row,sep="")
 
+#def switch_map(self,mnum):
+    #if mnum == 1:
+        #self.mapfile = 'map.txt'
+    #elif mnum == 2:
+        #self.mapfile = 'map2.txt'
+    #elif mnum == 3:
+        #self.mapfile = 'map3.txt'
+    #self.initialize()
 # Needs to be fixed to work with project
     def switch_map(self):  # tested, works for now, although might not work how intended with program
         self.mapfile = input("Enter the filename of another map file")
@@ -148,12 +156,15 @@ class Rover():
         return icon
 
 # Prints the results of all the queries
-    def info(self):  # tested, works
-        position = [self.pos_x, self.pos_y]
-        self.print(f"Position: {position}")
+    def info(self):
+        self.print_pos()
         self.looking()
         self.print(f"Looking at: {self.front}")
         self.facing()
+
+    def print_pos(self):
+        position = [self.pos_x, self.pos_y]
+        self.print(f"Position: {position}")
 
 # Shows what the rover is looking at
     def looking(self):  # tested, works
