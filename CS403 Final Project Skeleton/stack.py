@@ -1,4 +1,3 @@
-
 class stack:
     def __init__(self):
         self.stack = []
@@ -13,7 +12,7 @@ class stack:
         if len(self.stack) <= 0:
             raise Exception
         else:
-            return self.stack[len(self.stack)-1]
+            return self.stack[len(self.stack) - 1]
 
     def checkScopes(self, id):
         i = len(self.stack)
@@ -29,7 +28,8 @@ class stack:
             if id == self.stack[i]['id']:
                 return self.stack[i]
             i -= 1
-#-------RAISE ERROR
+
+    # -------RAISE ERROR
 
     def assign(self, obj, val):
         id = obj['id']
@@ -43,7 +43,7 @@ class stack:
                 if id == self.stack[i]['id']:
                     self.stack[i]['val'] = val
                 i -= 1
-        
+
         else:
             item = []
             i = len(self.stack)
@@ -51,7 +51,7 @@ class stack:
                 if id == self.stack[i]['id']:
                     self.stack[i]['val'] = val
                 i -= 1
-            
+
             for i in obj['arr'][0:-1]:
                 item = item[i]
 
