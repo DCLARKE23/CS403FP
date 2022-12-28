@@ -3,13 +3,13 @@ Create nodes + parse tree using grammar:
 
    <program>  ::= <block>
    <block>    ::= { <decls> <stmts> }
-   <decls>    ::= e 
+   <decls>    ::= e
                 | <decl> <decls>
    <decl>     ::= <type> ID ;
    <type>     ::= BASIC <typecl>
-   <typecl>   ::= e 
+   <typecl>   ::= e
                 | [ NUM ] <typecl>
-   <stmts>    ::= e 
+   <stmts>    ::= e
                 | <stmt> <stmts>
    <stmt>     ::= <loc> = <bool> ;
                 | ROVER . <feature> ;
@@ -18,20 +18,20 @@ Create nodes + parse tree using grammar:
                 | WHILE ( <bool> ) <stmt>
                 | <block>
    <loc>      ::= ID <loccl>
-   <loccl>    ::= e 
+   <loccl>    ::= e
                 | [ <bool> ] <loccl>
    <bool>     ::= <join> <boolcl>
-   <boolcl>   ::= e 
+   <boolcl>   ::= e
                 | || <join> <boolcl>
    <join>     ::= <equality> <joincl>
-   <joincl>   ::= e 
+   <joincl>   ::= e
                 | && <equality> <joincl>
    <equality> ::= <rel> <equalcl>
-   <equalcl>  ::= e 
-                | == <rel> <equalcl> 
+   <equalcl>  ::= e
+                | == <rel> <equalcl>
                 | != <rel> <equalcl>
    <rel>      ::= <expr> <reltail>
-   <reltail>  ::= e 
+   <reltail>  ::= e
                 | <= <expr>
                 | >= <expr>
                 | > <expr>
@@ -363,7 +363,7 @@ def Expr():
     return current
 
 
-# <reltail>  ::= e 
+# <reltail>  ::= e
 #              | <= <expr>
 #              | >= <expr>
 #              | > <expr>
@@ -391,8 +391,8 @@ def Rel():
     return current
 
 
-# <equalcl>  ::= e 
-#              | == <rel> <equalcl> 
+# <equalcl>  ::= e
+#              | == <rel> <equalcl>
 #              | != <rel> <equalcl>
 def Equalcl():
     global CURR_TOKEN
@@ -416,7 +416,7 @@ def Equality():
     return current
 
 
-# <joincl>   ::= e 
+# <joincl>   ::= e
 #              | && <equality> <joincl>
 def Joincl():
     global CURR_TOKEN
@@ -437,7 +437,7 @@ def Join():
     return current
 
 
-# <boolcl>   ::= e 
+# <boolcl>   ::= e
 #              | || <join> <boolcl>
 def Boolcl():
     global CURR_TOKEN
@@ -458,7 +458,7 @@ def Bool():
     return current
 
 
-# <loccl>    ::= e 
+# <loccl>    ::= e
 #              | [ <bool> ] <loccl>
 def Loccl():
     global CURR_TOKEN
@@ -482,6 +482,7 @@ def Loc():
 
 
 # <stmt>     ::= <loc> = <bool> ;
+#              | ROVER . <feature> ;
 #              | IF ( <bool> ) <stmt>
 #              | IF ( <bool> ) <stmt> ELSE <stmt>
 #              | WHILE ( <bool> ) <stmt>
@@ -531,7 +532,7 @@ def Stmt():
     return current
 
 
-# <stmts>    ::= e 
+# <stmts>    ::= e
 #              | <stmt> <stmts>
 def Stmts():
     current = Node(NonTerminals.STMTS)
@@ -545,7 +546,7 @@ def Stmts():
     return current
 
 
-# <typecl>   ::= e 
+# <typecl>   ::= e
 #              | [ NUM ] <typecl>
 def Typecl():
     global CURR_TOKEN
@@ -580,7 +581,7 @@ def Decl():
     return current
 
 
-# <decls>    ::= e 
+# <decls>    ::= e
 #              | <decl> <decls>
 # Note: Follow(<decls>) = First(<stmt>) + Follow(<stmts>)
 def Decls():

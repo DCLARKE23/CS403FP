@@ -7,7 +7,8 @@ SCOPE = stack()
 class TypeMismatchError(Exception):
     pass
 
-#added INT, BOOL, CHAR, FLOAT, STRING
+
+# added INT, BOOL, CHAR, FLOAT, STRING
 class Vocab(enum.Enum):
     EOS = ""
     OPEN_PAREN = "("
@@ -135,10 +136,9 @@ class Node:
         else:
             print(f"{' ' * indent} < {symbol} >")
         for child in self.children:
-            child.print(indent=indent+2)
+            child.print(indent=indent + 2)
         if self.is_nonterminal:
             print(f"{' ' * indent} </ {symbol} >")
-
 
     def print_val(self):
         if not self.is_nonterminal:
@@ -205,9 +205,9 @@ class Node:
     def match_types(self, target_types):
         my_types = self.get_types()
         if any(
-            ttype in my_types
-            for ttype in target_types
-            ):
+                ttype in my_types
+                for ttype in target_types
+        ):
             return True
         return False
 
@@ -298,7 +298,7 @@ class FactorNode(Node):
 
         elif isinstance(self.children[0], LocNode):
             type = self.children[0].check_semantics()
-            #add error if factor is array
+            # add error if factor is array
 
         elif self.children[0].token.ttype == Vocab.NUM:
             return {'ttype': 'int',
@@ -317,7 +317,8 @@ class FactorNode(Node):
                     'arr': False,
                     'dimen': 0,
                     'val': None}
-#change to stop copying
+
+    # change to stop copying
     def run(self, rover):
         def arrIndex(obj):
             arr = obj['val']
@@ -328,7 +329,7 @@ class FactorNode(Node):
         if isinstance(self.children[0], BoolNode):
             return self.children[0].run(rover)
 
-        elif isinstance (self.children[0], LocNode):
+        elif isinstance(self.children[0], LocNode):
             info = self.children[0].run(rover)
             if len(info['3dArr']) == 0:
                 value = info['val']
@@ -361,6 +362,7 @@ class UnaryNode(Node):
 
             if (operator == '!' and type == 'bool') or (operator == '-' and (type == 'int' or type == 'double')):
                 return info
+
     def run(self, rover):
         if len(self.children) == 1:
             return self.children[0].run(rover)
@@ -372,6 +374,7 @@ class UnaryNode(Node):
             else:
                 return - obj
 
+
 class TermclNode(Node):
     def check_semantics(self):
         if len(self.children) == 0:
@@ -382,11 +385,11 @@ class TermclNode(Node):
 
             if termclInfo == None:
                 return unaryInfo
-            
+
             unaryType = unaryInfo['ttype']
             termclType = termclInfo['ttype']
-#-----------raise error
-            
+            # -----------raise error
+
             if unaryType != termclType:
                 unaryInfo['ttype'] = 'double'
             return unaryInfo
@@ -403,12 +406,13 @@ class TermclNode(Node):
                 unaryVal = term * unaryVal
             else:
                 if unaryVal == 0:
-                    #raise error
+                    # raise error
                     print("error")
-                unaryVal = term/unaryVal
+                unaryVal = term / unaryVal
 
             termclVal = self.children[2].run(rover, unaryVal)
             return termclVal
+
 
 class TermNode(Node):
     def check_semantics(self):
@@ -417,11 +421,11 @@ class TermNode(Node):
 
         if termInfo == None:
             return unaryInfo
-            
+
         unaryType = unaryInfo['ttype']
         termType = termInfo['ttype']
-#-----------raise error
-            
+        # -----------raise error
+
         if unaryType != termType:
             unaryInfo['ttype'] = 'double'
         return unaryInfo
@@ -443,11 +447,11 @@ class ExprclNode(Node):
 
             if termInfo == None:
                 return exprclInfo
-            
+
             termTtype = termInfo['ttype']
             exprclType = exprclInfo['ttype']
-#-----------raise error
-            
+            # -----------raise error
+
             if termTtype != exprclType:
                 termInfo['ttype'] = 'double'
             return termInfo
@@ -467,6 +471,7 @@ class ExprclNode(Node):
             exprclObj = self.children[2].run(rover, termObj)
             return exprclObj
 
+
 class ExprNode(Node):
     def check_semantics(self):
         termInfo = self.children[1].check_semantics()
@@ -474,11 +479,11 @@ class ExprNode(Node):
 
         if termInfo == None:
             return exprInfo
-            
+
         termType = exprInfo['ttype']
         exprType = termInfo['ttype']
-#-----------raise error
-            
+        # -----------raise error
+
         if termType != exprType:
             termInfo['ttype'] = 'double'
         return termInfo
@@ -487,6 +492,7 @@ class ExprNode(Node):
         termObj = self.children[0].run(rover)
         exprObj = self.children[0].run(rover, termObj)
         return exprObj
+
 
 class ReltailNode(Node):
     def check_semantics(self):
@@ -502,7 +508,7 @@ class ReltailNode(Node):
             return expr
 
         else:
-            operator =  self.children[0].token.value
+            operator = self.children[0].token.value
             exprObj = self.children[1].run(rover)
 
             if operator == '<=':
@@ -517,6 +523,7 @@ class ReltailNode(Node):
             elif operator == '>':
                 return expr > exprObj
 
+
 class RelNode(Node):
     def check_semantics(self):
         exprInfo = self.children[0].check_semantics()
@@ -526,9 +533,9 @@ class RelNode(Node):
             return exprInfo
 
         if exprInfo == 'bool' and reltailInfo == 'bool':
-            #raise error
+            # raise error
             print("error")
-        
+
         exprInfo['ttype'] = 'bool'
         return exprInfo
 
@@ -536,6 +543,7 @@ class RelNode(Node):
         exprObj = self.children[0].run(rover)
         reltailObj = self.children[1].run(rover, exprObj)
         return reltailObj
+
 
 class EqualclNode(Node):
     def check_semantics(self):
@@ -546,7 +554,7 @@ class EqualclNode(Node):
             relInfo = self.children[1].check_semantics()
             equalclInfo = self.children[2].check_semantics()
 
-#-----------raise errors
+            # -----------raise errors
             relInfo['ttype'] = 'bool'
             return relInfo
 
@@ -575,21 +583,22 @@ class EqualityNode(Node):
         if equalclInfo == None:
             return relInfo
 
-#-----------raise error
+        # -----------raise error
 
         relInfo['ttype'] = 'bool'
         return relInfo
-    
+
     def run(self, rover):
         relObj = self.children[0].run(rover)
         equalclObj = self.children[1].run(rover, relObj)
         return equalclObj
 
+
 class JoinclNode(Node):
     def check_semantics(self):
         if len(self.children) == 0:
             return None
-        
+
         else:
             equalityInfo = self.children[1].check_semantics()
             joinclInfo = self.children[2].check_semantics()
@@ -597,29 +606,30 @@ class JoinclNode(Node):
             if joinclInfo == None:
                 return equalityInfo
 
-#-----------raise error
+            # -----------raise error
 
             return equalityInfo
 
     def run(self, rover, join):
         if len(self.children) == 0:
             return join
-        
+
         else:
             equalityObj = self.children[1].run(rover)
             equalityObj = join and equalityObj
             joinObj = self.children[2].run(rover, equalityObj)
             return joinObj
 
+
 class JoinNode(Node):
     def check_semantics(self):
         equalityInfo = self.children[0].check_semantics()
         joinclInfo = self.children[1].check_semantics()
-        
+
         if joinclInfo == None:
             return equalityInfo
 
-#-------raise error
+        # -------raise error
 
         return joinclInfo
 
@@ -627,6 +637,7 @@ class JoinNode(Node):
         equalityObj = self.children[0].run(rover)
         joinclObj = self.children[1].run(rover, equalityObj)
         return joinclObj
+
 
 class BoolclNode(Node):
     def check_semantics(self):
@@ -640,7 +651,7 @@ class BoolclNode(Node):
             if boolclInfo == None:
                 return joinInfo
 
-#-----------raise error
+            # -----------raise error
 
             return joinInfo
 
@@ -655,6 +666,7 @@ class BoolclNode(Node):
             boolclObj = self.children[2].run(rover, joinObj)
             return boolclObj
 
+
 class BoolNode(Node):
     def check_semantics(self):
         joinInfo = self.children[0].check_semantics()
@@ -663,7 +675,7 @@ class BoolNode(Node):
         if boolclInfo == None:
             return joinInfo
 
-#-------raise error
+        # -------raise error
 
         return boolclInfo
 
@@ -671,6 +683,7 @@ class BoolNode(Node):
         joinObj = self.children[0].run(rover)
         boolclObj = self.children[1].run(rover, joinObj)
         return boolclObj
+
 
 class LocclNode(Node):
     def check_semantics(self):
@@ -681,14 +694,14 @@ class LocclNode(Node):
                     'val': None}
 
         else:
-           index = self.children[0].check_semantcis()
+            index = self.children[0].check_semantcis()
 
-#----------raise error
+            # ----------raise error
 
-           locclInfo = self.children[1].check_semantics()
-           locclInfo['dimen'] = locclInfo['dimen'] + 1
-           locclInfo['arr'] = True
-           return locclInfo
+            locclInfo = self.children[1].check_semantics()
+            locclInfo['dimen'] = locclInfo['dimen'] + 1
+            locclInfo['arr'] = True
+            return locclInfo
 
     def run(self, rover):
         if len(self.children) == 0:
@@ -703,20 +716,21 @@ class LocclNode(Node):
             else:
                 return [boolObj] + locclObj
 
+
 class LocNode(Node):
     def check_semantics(self):
         global SCOPE
         id = self.children[0].token.value
 
-#-------raise
+        # -------raise
 
         symbol = SCOPE.getId(id)
         type = self.children[1].check_semantics()
         typeDimen = symbol['dimen'] - type['dimen']
 
-#-------raise error
+        # -------raise error
 
-        if typeDimen > 0: 
+        if typeDimen > 0:
             arr = True
         else:
             arr = False
@@ -744,13 +758,14 @@ class LocNode(Node):
                     'ttype': obj['ttype'],
                     'arr': arr}
 
+
 class StmtNode(Node):
     def check_semantics(self):
         if isinstance(self.children[0], LocNode):
             symbol = self.children[0].check_semantics()
             type = self.children[1].check_semantics()
 
-#-----------raise error
+        # -----------raise error
 
         elif isinstance(self.children[0], BlockNode):
             self.children[0].check_semantics()
@@ -761,8 +776,8 @@ class StmtNode(Node):
         elif self.children[0].token.value == Vocab.IF or self.children[0].token.value == Vocab.WHILE:
             condition = self.children[1].check_semantics()
 
-#-----------raise error
-            
+            # -----------raise error
+
             self.children[2].check_semantics()
             if len(self.children) > 3:
                 self.children[4].check_semantics()
@@ -794,6 +809,7 @@ class StmtNode(Node):
                     break
                 self.children[2].run(rover)
 
+
 class StmtsNode(Node):
     def check_semantics(self):
         if len(self.children) > 0:
@@ -804,6 +820,7 @@ class StmtsNode(Node):
         if len(self.children) > 0:
             stmtObj = self.children[0].run(rover)
             stmtsObj = self.children[1].run(rover)
+
 
 class TypeclNode(Node):
     def check_semantics(self):
@@ -822,7 +839,7 @@ class TypeclNode(Node):
     def run(self, rover):
         if len(self.children) == 0:
             return None
-        
+
         else:
             len = int(self.children[0].token.value)
             subarr = self.children[1].run(rover)
@@ -832,6 +849,7 @@ class TypeclNode(Node):
                 newArr.append(subarr)
 
             return newArr
+
 
 class TypeNode(Node):
     def check_semantics(self):
@@ -846,6 +864,7 @@ class TypeNode(Node):
 
         if arr == None:
             return {'ttype': ttype, 'val': arr}
+
 
 class DeclNode(Node):
     def check_semantics(self):
@@ -863,6 +882,7 @@ class DeclNode(Node):
 
         SCOPE.top()[id] = typeObj
 
+
 class DeclsNode(Node):
     def check_semantics(self):
         if len(self.children) > 0:
@@ -873,6 +893,7 @@ class DeclsNode(Node):
         if len(self.children) > 0:
             self.children[0].run(rover)
             self.children[1].run(rover)
+
 
 class BlockNode(Node):
     def check_semantics(self):
@@ -892,6 +913,7 @@ class BlockNode(Node):
         self.children[1].run(rover)
 
         SCOPE.pop()
+
 
 class FeatureNode(Node):
     pass
