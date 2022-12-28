@@ -1,82 +1,84 @@
 """
 Create nodes + parse tree using grammar:
 
-   <program>  ::= <block>
-   <block>    ::= { <decls> <stmts> }
-   <decls>    ::= e
-                | <decl> <decls>
-   <decl>     ::= <type> ID ;
-   <type>     ::= BASIC <typecl>
-   <typecl>   ::= e
-                | [ NUM ] <typecl>
-   <stmts>    ::= e
-                | <stmt> <stmts>
-   <stmt>     ::= <loc> = <bool> ;
-                | ROVER . <feature> ;
-                | IF ( <bool> ) <stmt>
-                | IF ( <bool> ) <stmt> ELSE <stmt>
-                | WHILE ( <bool> ) <stmt>
-                | <block>
-   <loc>      ::= ID <loccl>
-   <loccl>    ::= e
-                | [ <bool> ] <loccl>
-   <bool>     ::= <join> <boolcl>
-   <boolcl>   ::= e
-                | || <join> <boolcl>
-   <join>     ::= <equality> <joincl>
-   <joincl>   ::= e
-                | && <equality> <joincl>
-   <equality> ::= <rel> <equalcl>
-   <equalcl>  ::= e
-                | == <rel> <equalcl>
-                | != <rel> <equalcl>
-   <rel>      ::= <expr> <reltail>
-   <reltail>  ::= e
-                | <= <expr>
-                | >= <expr>
-                | > <expr>
-                | < <expr>
-   <expr>     ::= <term> <exprcl>
-   <exprcl>   ::= e
-                | + <term> <exprcl>
-                | - <term> <exprcl>
-   <term>     ::= <unary> <termcl>
-   <termcl>   ::= e
-                | * <unary> <termcl>
-                | / <unary> <termcl>
-   <unary>    ::= ! <unary>
-                | - <unary>
-                | <factor>
-   <factor>   ::= ( <bool> )
-                | <loc>
-                | NUM
-                | REAL
-                | TRUE
-                | FALSE
-   <feature>  ::= PRINT_MAP
-                | SWITCH_MAP INT
-                | INFO
-                | PRINT_POS
-                | LOOKING
-                | FACING
-                | TURNLEFT
-                | TURNRIGHT
-                | MOVE_TILE
-                | DRILL
-                | PRINT_INV
-                | ENVSCAN
-                | BOMB
-                | WAYPOINT_SET
-                | MOVETO_WAYPOINT
-                | CACHE_MAKE
-                | CACHE_DUMP
-                | CHARGE
+<program>  ::= <block>
+<block>    ::= { <decls> <stmts> }
+<decls>    ::= e 
+             | <decl> <decls>
+<decl>     ::= <type> ID ;
+<type>     ::= BASIC <typecl>
+<typecl>   ::= e 
+             | [ NUM ] <typecl>
+<stmts>    ::= e 
+             | <stmt> <stmts>
+<stmt>     ::= <loc> = <bool> ;
+             | ROVER . <feature> ;
+             | IF ( <bool> ) <stmt>
+             | IF ( <bool> ) <stmt> ELSE <stmt>
+             | WHILE ( <bool> ) <stmt>
+             | <block>
+<loc>      ::= ID <loccl>
+<loccl>    ::= e 
+             | [ <bool> ] <loccl>
+<bool>     ::= <join> <boolcl>
+<boolcl>   ::= e 
+             | || <join> <boolcl>
+<join>     ::= <equality> <joincl>
+<joincl>   ::= e 
+             | && <equality> <joincl>
+<equality> ::= <rel> <equalcl>
+<equalcl>  ::= e 
+             | == <rel> <equalcl> 
+             | != <rel> <equalcl>
+<rel>      ::= <expr> <reltail>
+<reltail>  ::= e 
+             | <= <expr>
+             | >= <expr>
+             | > <expr>
+             | < <expr>
+<expr>     ::= <term> <exprcl>
+<exprcl>   ::= e
+             | + <term> <exprcl>
+             | - <term> <exprcl>
+<term>     ::= <unary> <termcl>
+<termcl>   ::= e
+             | * <unary> <termcl>
+             | / <unary> <termcl>
+<unary>    ::= ! <unary>
+             | - <unary>
+             | <factor>
+<factor>   ::= ( <bool> )
+             | <loc>
+             | NUM
+             | REAL
+             | TRUE
+             | FALSE
+<feature>  ::= PRINT_MAP
+             | SWITCH_MAP INT
+             | INFO
+             | PRINT_POS
+             | LOOKING
+             | FACING
+             | TURNLEFT
+             | TURNRIGHT
+             | MOVE_TILE
+             | DRILL
+             | PRINT_INV
+             | ENVSCAN
+             | BOMB
+             | WAYPOINT_SET
+             | MOVETO_WAYPOINT
+             | CACHE_MAKE
+             | CACHE_DUMP
+             | CHARGE
 """
 import enum
 import sys
 import pathlib
 
+#import from parser components
 from parser_components import (
+    FeatureNode,
     FactorNode,
     UnaryNode,
     TermclNode,
@@ -107,7 +109,6 @@ from parser_components import (
     NotNode,
     Token,
     Vocab,
-    FeatureNode
 )
 
 
@@ -124,7 +125,7 @@ TERMINALS = (
     )
 )
 
-#look in assignment 4
+
 class UnexpectedTokenError(Exception):
     pass
 
@@ -207,24 +208,6 @@ def match_cases(*cases):
             return True
     return False
 
-# <feature>  ::= PRINT_MAP
-#                 | SWITCH_MAP INT
-#                 | INFO
-#                 | PRINT_POS
-#                 | LOOKING
-#                 | FACING
-#                 | TURNLEFT
-#                 | TURNRIGHT
-#                 | MOVE_TILE
-#                 | DRILL
-#                 | PRINT_INV
-#                 | ENVSCAN
-#                 | BOMB
-#                 | WAYPOINT_SET
-#                 | MOVETO_WAYPOINT
-#                 | CACHE_MAKE
-#                 | CACHE_DUMP
-#                 | CHARGE
 def Feature():
     global CURR_TOKEN
     current = FeatureNode(NonTerminals.FEATURE)
@@ -256,7 +239,10 @@ def Feature():
         current.add_child(Node(CURR_TOKEN))
         must_be(Vocab.INT)
     else:
-        raise UnexpectedTokenError()
+        raise UnexpectedTokenError(
+            f"Unexpected token found: {CURR_TOKEN.value}, "
+            f"expected: rover feature."
+        )
 
 # <factor>   ::= ( <bool> )
 #              | <loc>
@@ -266,7 +252,7 @@ def Feature():
 #              | FALSE
 def Factor():
     global CURR_TOKEN
-    current = Node(NonTerminals.FACTOR)
+    current = FactorNode(NonTerminals.FACTOR)
     if match_cases(
         Vocab.NUM,
         Vocab.REAL,
@@ -318,7 +304,7 @@ def Unary():
 #              | / <unary> <termcl>
 def Termcl():
     global CURR_TOKEN
-    current = Node(NonTerminals.TERMCL)
+    current = TermclNode(NonTerminals.TERMCL)
     if match_cases(
         Vocab.MUL,
         Vocab.DIV,
@@ -332,7 +318,7 @@ def Termcl():
 
 # <term>     ::= <unary> <termcl>
 def Term():
-    current = Node(NonTerminals.TERM)
+    current = TermNode(NonTerminals.TERM)
     current.add_child(Unary())
     current.add_child(Termcl())
     return current
@@ -343,7 +329,7 @@ def Term():
 #              | - <term> <exprcl>
 def Exprcl():
     global CURR_TOKEN
-    current = Node(NonTerminals.EXPRCL)
+    current = ExprclNode(NonTerminals.EXPRCL)
     if match_cases(
         Vocab.PLUS,
         Vocab.MINUS,
@@ -357,20 +343,20 @@ def Exprcl():
 
 # <expr>     ::= <term> <exprcl>
 def Expr():
-    current = Node(NonTerminals.EXPR)
+    current = ExprNode(NonTerminals.EXPR)
     current.add_child(Term())
     current.add_child(Exprcl())
     return current
 
 
-# <reltail>  ::= e
+# <reltail>  ::= e 
 #              | <= <expr>
 #              | >= <expr>
 #              | > <expr>
 #              | < <expr>
 def Reltail():
     global CURR_TOKEN
-    current = Node(NonTerminals.RELTAIL)
+    current = ReltailNode(NonTerminals.RELTAIL)
     if match_cases(
         Vocab.LTEQ,
         Vocab.GTEQ,
@@ -385,18 +371,18 @@ def Reltail():
 
 # <rel>      ::= <expr> <reltail>
 def Rel():
-    current = Node(NonTerminals.REL)
+    current = RelNode(NonTerminals.REL)
     current.add_child(Expr())
     current.add_child(Reltail())
     return current
 
 
-# <equalcl>  ::= e
-#              | == <rel> <equalcl>
+# <equalcl>  ::= e 
+#              | == <rel> <equalcl> 
 #              | != <rel> <equalcl>
 def Equalcl():
     global CURR_TOKEN
-    current = Node(NonTerminals.EQUALCL)
+    current = EqualclNode(NonTerminals.EQUALCL)
     if match_cases(
         Vocab.EQ,
         Vocab.NEQ,
@@ -410,17 +396,17 @@ def Equalcl():
 
 # <equality> ::= <rel> <equalcl>
 def Equality():
-    current = Node(NonTerminals.EQUALITY)
+    current = EqualityNode(NonTerminals.EQUALITY)
     current.add_child(Rel())
     current.add_child(Equalcl())
     return current
 
 
-# <joincl>   ::= e
+# <joincl>   ::= e 
 #              | && <equality> <joincl>
 def Joincl():
     global CURR_TOKEN
-    current = Node(NonTerminals.JOINCL)
+    current = JoinclNode(NonTerminals.JOINCL)
     if match_cases(Vocab.AND):
         current.add_child(Node(CURR_TOKEN))
         CURR_TOKEN = get_token()
@@ -431,17 +417,17 @@ def Joincl():
 
 # <join>     ::= <equality> <joincl>
 def Join():
-    current = Node(NonTerminals.JOIN)
+    current = JoinNode(NonTerminals.JOIN)
     current.add_child(Equality())
     current.add_child(Joincl())
     return current
 
 
-# <boolcl>   ::= e
+# <boolcl>   ::= e 
 #              | || <join> <boolcl>
 def Boolcl():
     global CURR_TOKEN
-    current = Node(NonTerminals.BOOLCL)
+    current = BoolclNode(NonTerminals.BOOLCL)
     if match_cases(Vocab.OR):
         current.add_child(Node(CURR_TOKEN))
         CURR_TOKEN = get_token()
@@ -452,17 +438,17 @@ def Boolcl():
 
 # <bool>     ::= <join> <boolcl>
 def Bool():
-    current = Node(NonTerminals.BOOL)
+    current = BoolNode(NonTerminals.BOOL)
     current.add_child(Join())
     current.add_child(Boolcl())
     return current
 
 
-# <loccl>    ::= e
+# <loccl>    ::= e 
 #              | [ <bool> ] <loccl>
 def Loccl():
     global CURR_TOKEN
-    current = Node(NonTerminals.LOCCL)
+    current = LocclNode(NonTerminals.LOCCL)
     if match_cases(Vocab.OPEN_SQPAR):
         CURR_TOKEN = get_token()
         current.add_child(Bool())
@@ -474,7 +460,7 @@ def Loccl():
 # <loc>      ::= ID <loccl>
 def Loc():
     global CURR_TOKEN
-    current = Node(NonTerminals.LOC)
+    current = LocNode(NonTerminals.LOC)
     current.add_child(Node(CURR_TOKEN))
     must_be(Vocab.ID)
     current.add_child(Loccl())
@@ -482,22 +468,14 @@ def Loc():
 
 
 # <stmt>     ::= <loc> = <bool> ;
-#              | ROVER . <feature> ;
 #              | IF ( <bool> ) <stmt>
 #              | IF ( <bool> ) <stmt> ELSE <stmt>
 #              | WHILE ( <bool> ) <stmt>
 #              | <block>
 def Stmt():
     global CURR_TOKEN
-    current = Node(NonTerminals.STMT)
-    if match_cases(Vocab.ROVER):
-        current.add_child(Node(CURR_TOKEN))
-        CURR_TOKEN = get_token()
-        must_be(Vocab.DOT)
-        current.add_child(Feature())
-        must_be(Vocab.SEMICOLON)
-
-    elif match_cases(Vocab.IF):
+    current = StmtNode(NonTerminals.STMT)
+    if match_cases(Vocab.IF):
         current.add_child(Node(CURR_TOKEN))
         CURR_TOKEN = get_token()
 
@@ -520,6 +498,14 @@ def Stmt():
         must_be(Vocab.CLOSE_PAREN)
         current.add_child(Stmt())
 
+    elif match_cases(Vocab.ROVER):
+        current.add_child(Node(CURR_TOKEN))
+        CURR_TOKEN = get_token()
+
+        must_be(Vocab.DOT)
+        current.add_child(Feature())
+        must_be(Vocab.SEMICOLON)
+
     elif match_cases(Vocab.OPEN_BRACE):
         current.add_child(Block())
     else:
@@ -532,10 +518,10 @@ def Stmt():
     return current
 
 
-# <stmts>    ::= e
+# <stmts>    ::= e 
 #              | <stmt> <stmts>
 def Stmts():
-    current = Node(NonTerminals.STMTS)
+    current = StmtsNode(NonTerminals.STMTS)
     if match_cases(
         Vocab.CLOSE_BRACE, # More concise to start with Follow(<stmts>)
     ):
@@ -546,11 +532,11 @@ def Stmts():
     return current
 
 
-# <typecl>   ::= e
+# <typecl>   ::= e 
 #              | [ NUM ] <typecl>
 def Typecl():
     global CURR_TOKEN
-    current = Node(NonTerminals.TYPECL)
+    current = TypeclNode(NonTerminals.TYPECL)
     if match_cases(Vocab.OPEN_SQPAR):
         CURR_TOKEN=get_token()
         current.add_child(Node(CURR_TOKEN))
@@ -563,7 +549,7 @@ def Typecl():
 # <type>     ::= BASIC <typecl>
 def Type():
     global CURR_TOKEN
-    current = Node(NonTerminals.TYPE)
+    current = TypeNode(NonTerminals.TYPE)
     current.add_child(Node(CURR_TOKEN))
     must_be(Vocab.BASIC)
     current.add_child(Typecl())
@@ -573,7 +559,7 @@ def Type():
 # <decl>     ::= <type> ID ;
 def Decl():
     global CURR_TOKEN
-    current = Node(NonTerminals.DECL)
+    current = DeclNode(NonTerminals.DECL)
     current.add_child(Type())
     current.add_child(Node(CURR_TOKEN))
     must_be(Vocab.ID)
@@ -581,18 +567,17 @@ def Decl():
     return current
 
 
-# <decls>    ::= e
+# <decls>    ::= e 
 #              | <decl> <decls>
 # Note: Follow(<decls>) = First(<stmt>) + Follow(<stmts>)
 def Decls():
-    current = Node(NonTerminals.DECLS)
+    current = DeclsNode(NonTerminals.DECLS)
     if match_cases(
         Vocab.IF,
         Vocab.WHILE,
         Vocab.OPEN_BRACE,
         Vocab.ID,
         Vocab.CLOSE_BRACE,
-        Vocab.ROVER,
     ):
         pass
     else:
@@ -603,7 +588,7 @@ def Decls():
 
 # <block>    ::= { <decls> <stmts> }
 def Block():
-    current = Node(NonTerminals.BLOCK)
+    current = BlockNode(NonTerminals.BLOCK)
     must_be(Vocab.OPEN_BRACE)
     current.add_child(Decls())
     current.add_child(Stmts())
@@ -613,7 +598,7 @@ def Block():
 
 # <program>  ::= <block>
 def Program():
-    current = Node(NonTerminals.PROGRAM)
+    current = ProgramNode(NonTerminals.PROGRAM)
     current.add_child(Block())
     return current
 

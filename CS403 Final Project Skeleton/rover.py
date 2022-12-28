@@ -3,6 +3,7 @@ import pathlib
 import time
 import traceback
 import random
+import parser
 
 
 # The maximum amount of time that the rover can run in seconds
@@ -75,7 +76,16 @@ class Rover():
 
     def parse_and_execute_cmd(self, command):
         self.print(f"Running command: {command}")
-        pass
+        tree = parser.get_parse_tree()
+
+        for i in tree.children:
+            i.check_semantics()
+
+        for i in tree.children:
+            try:
+                i.run(self)
+            except TypeError as te:
+                raise RuntimeError(te.args)
 
     def wait_for_command(self):
         start = time.time()
@@ -363,7 +373,7 @@ class Rover():
             self.map[self.pos_x][self.pos_y-1] = ' '
             self.print("Charging Complete. Retracting Solar Panels")
 
-def _main():
+def main():
     # Initialize the rovers
     rover1 = Rover(ROVER_1)
     rover2 = Rover(ROVER_2)
@@ -379,7 +389,7 @@ def _main():
     # Wait for the rovers to stop running (after MAX_RUNTIME)
     for p in procs:
         p.join()
-
+"""
 def main():
     rover = Rover(name="Rover_1")
     rover.initialize()
@@ -425,7 +435,7 @@ def main():
             rover.print_map()
         elif cmd == 'q':
             rover.info()
+"""
 
-
-if __name__=="__main__":
-    main()
+#if __name__=="__main__":
+#    main()
