@@ -3,12 +3,11 @@ import enum
 
 SCOPE = {}
 
-#assume this is where the code for type checking goes
 
 class TypeMismatchError(Exception):
     pass
 
-
+#added INT, BOOL, CHAR, FLOAT, STRING
 class Vocab(enum.Enum):
     EOS = ""
     OPEN_PAREN = "("
@@ -17,6 +16,15 @@ class Vocab(enum.Enum):
     CLOSE_BRACE = "}"
     OPEN_SQPAR = "["
     CLOSE_SQPAR = "]"
+    INT = "int"
+    BOOL = "bool"
+    CHAR = "char"
+    FLOAT = "float"
+    DOUBLE = "double"
+    STRING = "string"
+    CLASS = "class"
+    FUNTION = "function"
+    METHOD = "method"
     IF = "if"
     ELSE = "else"
     WHILE = "while"
@@ -41,6 +49,7 @@ class Vocab(enum.Enum):
     DIV = "/"
     BASIC = "basic"
     SEMICOLON = ";"
+    DOT = "."
     ROVER = "rover"
 
 
@@ -70,6 +79,7 @@ class NonTerminals(enum.Enum):
     TERMCL = 21
     UNARY = 22
     FACTOR = 23
+    ARGS = 24
 
 
 class Token:
@@ -166,6 +176,8 @@ class Node:
             return "unary"
         elif self.token == NonTerminals.FACTOR:
             return "factor"
+        elif self.token == NonTerminals.ARGS:
+            return "args"
         else:
             return "???"
 
@@ -240,7 +252,7 @@ class MinusNode(ProgramNode):
         """ What does this do?
 
         In this node, you only have one child. We run, the child then
-        multiply its result by -1. In this case, the child MUST return
+        multiply it's result by -1. In this case, the child MUST return
         an int or a double (hint for type checking above), then we
         return this result.
 
@@ -284,3 +296,66 @@ class UnaryNode(ProgramNode):
         if self.operation_node:
             return self.operation_node.run()
         return self.operand.run()
+
+class TermclNode(ProgramNode):
+    pass
+
+class TermNode(ProgramNode):
+    pass
+
+class ExprclNode(ProgramNode):
+    pass
+
+class ExprNode(ProgramNode):
+    pass
+
+class ReltailNode(ProgramNode):
+    pass
+
+class RelNode(ProgramNode):
+    pass
+
+class EqualclNode(ProgramNode):
+    pass
+
+class EqualityNode(ProgramNode):
+    pass
+
+class JoinclNode(ProgramNode):
+    pass
+
+class JoinNode(ProgramNode):
+    pass
+
+class BoolclNode(ProgramNode):
+    pass
+
+class BoolNode(ProgramNode):
+    pass
+
+class LocclNode(ProgramNode):
+    pass
+
+class LocNode(ProgramNode):
+    pass
+
+class StmtNode(ProgramNode):
+    pass
+
+class StmtsNode(ProgramNode):
+    pass
+
+class TypeclNode(ProgramNode):
+    pass
+
+class TypeNode(ProgramNode):
+    pass
+
+class DeclNode(ProgramNode):
+    pass
+
+class DeclsNode(ProgramNode):
+    pass
+
+class BlockNode(ProgramNode):
+    pass
