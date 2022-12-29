@@ -578,6 +578,7 @@ def Decls():
         Vocab.OPEN_BRACE,
         Vocab.ID,
         Vocab.CLOSE_BRACE,
+        Vocab.ROVER,
     ):
         pass
     else:
