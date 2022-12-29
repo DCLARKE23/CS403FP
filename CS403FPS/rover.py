@@ -72,7 +72,6 @@ class Rover():
         self.front = ''
         self.inventory = []
         self.waypoint = False
-
         self.initialize()
 
     def print(self, msg):
@@ -136,7 +135,7 @@ class Rover():
         self.map[xcoords[spawn_tile]][ycoords[spawn_tile]] = self.roverchar()
         self.pos_x = xcoords[spawn_tile]
         self.pos_y = ycoords[spawn_tile]
-        #self.print_map()
+        self.print_map()
 
 # Helper function to be called by other functions, not explicitly by user
     def print_map(self):
@@ -384,10 +383,15 @@ def main():
     my_rovers = [rover1, rover2]
     # Run the rovers in parallel
     procs = []
+
     for rover in my_rovers:
+        #start = multiprocessing.Process(target=rover.initialize, args=())
+        #start.start()
+        #procs.append(start)
         p = multiprocessing.Process(target=rover.wait_for_command, args=())
         p.start()
         procs.append(p)
+
 
     # Wait for the rovers to stop running (after MAX_RUNTIME)
     for p in procs:

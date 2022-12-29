@@ -903,11 +903,11 @@ class TypeclNode(Node):
             return None
         
         else:
-            len = int(self.children[0].token.value)
+            length = int(self.children[0].token.value)
             subarr = self.children[1].run(rover)
             newArr = []
 
-            for i in range(0, len):
+            for i in range(0, length):
                 newArr.append(subarr)
 
             return newArr
