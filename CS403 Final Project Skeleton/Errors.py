@@ -8,7 +8,7 @@ class errors(Exception):
         global SCOPE_STACK
         SCOPE_STACK = stack()
 
-    def TypeMismatch(self):
+    def TypeMismatch(self,expected,type_):
         return f"[TYPE MISMATCH]: expected '{self.expected}' but got '{self.type_}'"
 
     def UndeclaredVar(self):

@@ -139,18 +139,18 @@ class Rover():
         for row in self.map:
             print(*row,sep="")
 
-#def switch_map(self,mnum):
-    #if mnum == 1:
-        #self.mapfile = 'map.txt'
-    #elif mnum == 2:
-        #self.mapfile = 'map2.txt'
-    #elif mnum == 3:
-        #self.mapfile = 'map3.txt'
-    #self.initialize()
-# Needs to be fixed to work with project
-    def switch_map(self):  # tested, works for now, although might not work how intended with program
-        self.mapfile = input("Enter the filename of another map file")
+    def switch_map(self,mnum):
+        if mnum == 1:
+            self.mapfile = 'map.txt'
+        elif mnum == 2:
+            self.mapfile = 'map2.txt'
+        elif mnum == 3:
+            self.mapfile = 'map3.txt'
         self.initialize()
+# Needs to be fixed to work with project
+#     def switch_map(self):  # tested, works for now, although might not work how intended with program
+#         self.mapfile = input("Enter the filename of another map file")
+#         self.initialize()
 
 # Helper function that changes the character of the rover to indicate direction
     def roverchar(self):
