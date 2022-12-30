@@ -1,6 +1,7 @@
 {
-	int i ;
-	i = 0 ;
-	i = - i ;
-	; ; ;
+	bool i ;
+	i = true ;
+	if ( i == true ) {
+	    rover . move_tile ;
+	}
 }

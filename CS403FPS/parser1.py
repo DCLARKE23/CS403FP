@@ -206,6 +206,12 @@ def match_cases(*cases):
             return True
     return False
 
+
+#Production Functions
+#===================================
+
+
+#allows rover commands to be parsed
 def Feature():
     global CURR_TOKEN
     current = FeatureNode(NonTerminals.FEATURE)
@@ -586,7 +592,6 @@ def Block():
 
 # <program>  ::= <block>
 def Program():
-    print("in parsr program")
     current = ProgramNode(NonTerminals.PROGRAM)
     current.add_child(Block())
     return current

@@ -1,5 +1,6 @@
 {
-    int n = 0 ;
+    int n ;
+    n = 0 ;
     rover . switch_map 4 ;
     while ( n < 4 ) {
         rover . move_tile ;

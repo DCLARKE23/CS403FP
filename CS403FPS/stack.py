@@ -1,5 +1,5 @@
-from Errors import UndefinedVarError
-
+from Errors import UndefinedError
+#constructed stack to help keep track of variables
 class stack:
     def __init__(self):
         self.stack = []
@@ -15,11 +15,11 @@ class stack:
             raise Exception
         else:
             return self.stack[len(self.stack) - 1]
-
+# functions such that each time a function is exited or scope is changed, variables in that scope are popped
     def checkScopes(self, id):
         i = len(self.stack)-1
         while i >= 0:
-            if id == self.stack[i]:
+            if id in self.stack[i]:
                 return True
             i -= 1
         return False
@@ -31,7 +31,7 @@ class stack:
                 return self.stack[i]
             i -= 1
 
-        raise UndefinedVarError(id)
+        raise UndefinedError(id)
 
 
     def assign(self, obj, val):
@@ -43,7 +43,7 @@ class stack:
         if len(obj['arr']) == 0:
             i = len(self.stack)-1
             while i >= 0:
-                if id == self.stack[i]:
+                if id in self.stack[i]:
                     self.stack[i][id]['val'] = val
                 i -= 1
 
@@ -51,7 +51,7 @@ class stack:
             item = []
             i = len(self.stack)-1
             while i >= 0:
-                if id == self.stack[i]:
+                if id in self.stack[i]:
                     self.stack[i][id]['val'] = val
                 i -= 1
 

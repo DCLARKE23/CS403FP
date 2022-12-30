@@ -1,4 +1,4 @@
-class TypeMismatchError(Exception):
+class IncorrectTypeError(Exception):
     def __init__(self, expected, type_):
         self.expected = expected
         self.type_ = type_
@@ -6,21 +6,21 @@ class TypeMismatchError(Exception):
     def TMerror(self):
         return f"[TYPE MISMATCH]: expected '{self.expected}' but got '{self.type_}'"
 
-class UndeclaredVarError(Exception):
+class UndeclaredError(Exception):
     def __init__(self, name):
         self.name = name
 
     def UVerror(self):
         return f"[UNDECLARED VARIABLE]: variable {self.name} is either not defined or outside of scope."
 
-class UndefinedVarError(Exception):
+class UndefinedError(Exception):
     def __init__(self, name):
         self.name = name
 
-    def __str__(self):
+    def UDerror(self):
         return f"[UNDEFINED VARIABLE]: variable {self.name} is undefined"
 
-class RedefinedVarError(Exception):
+class RedefinedError(Exception):
     def __init__(self, name):
         self.name = name
 

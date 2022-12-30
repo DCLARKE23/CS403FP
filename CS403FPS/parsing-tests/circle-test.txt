@@ -1,6 +1,8 @@
 {
-   int cl = 0 ;
-   int ccl = 0 ;
+   int cl ;
+   int ccl ;
+   cl = 0 ;
+   ccl = 0 ;
    while ( cl < 3 ) {
         rover . turnRight ;
         rover . move_tile ;
