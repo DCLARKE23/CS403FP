@@ -1,0 +1,70 @@
+<program>  ::= <block>
+<block>    ::= { <decls> <stmts> }
+<decls>    ::= e
+             | <decl> <decls>
+<decl>     ::= <type> ID ;
+<type>     ::= BASIC <typecl>
+<typecl>   ::= e
+             | [ NUM ] <typecl>
+<stmts>    ::= e
+             | <stmt> <stmts>
+<stmt>     ::= <loc> = <bool> ;
+             | ROVER . <feature> ;
+             | IF ( <bool> ) <stmt>
+             | IF ( <bool> ) <stmt> ELSE <stmt>
+             | WHILE ( <bool> ) <stmt>
+             | <block>
+<loc>      ::= ID <loccl>
+<loccl>    ::= e
+             | [ <bool> ] <loccl>
+<bool>     ::= <join> <boolcl>
+<boolcl>   ::= e
+             | || <join> <boolcl>
+<join>     ::= <equality> <joincl>
+<joincl>   ::= e
+             | && <equality> <joincl>
+<equality> ::= <rel> <equalcl>
+<equalcl>  ::= e
+             | == <rel> <equalcl>
+             | != <rel> <equalcl>
+<rel>      ::= <expr> <reltail>
+<reltail>  ::= e
+             | <= <expr>
+             | >= <expr>
+             | > <expr>
+             | < <expr>
+<expr>     ::= <term> <exprcl>
+<exprcl>   ::= e
+             | + <term> <exprcl>
+             | - <term> <exprcl>
+<term>     ::= <unary> <termcl>
+<termcl>   ::= e
+             | * <unary> <termcl>
+             | / <unary> <termcl>
+<unary>    ::= ! <unary>
+             | - <unary>
+             | <factor>
+<factor>   ::= ( <bool> )
+             | <loc>
+             | NUM
+             | REAL
+             | TRUE
+             | FALSE
+<feature>  ::= PRINT_MAP
+             | SWITCH_MAP INT
+             | INFO
+             | PRINT_POS
+             | LOOKING
+             | FACING
+             | TURNLEFT
+             | TURNRIGHT
+             | MOVE_TILE
+             | DRILL
+             | PRINT_INV
+             | ENVSCAN
+             | BOMB
+             | WAYPOINT_SET
+             | MOVETO_WAYPOINT
+             | CACHE_MAKE
+             | CACHE_DUMP
+             | CHARGE
