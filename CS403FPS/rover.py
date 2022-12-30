@@ -4,7 +4,7 @@ import time
 import traceback
 import random
 import parser1 as parser
-
+# Changed the name of parser to avoid conflict with existing parser library
 
 class RunTimeError(Exception):
     def __init__(self, msg):
@@ -77,7 +77,7 @@ class Rover():
         self.front = ''
         self.inventory = []
         self.waypoint = False
-        self.initialize()
+        self.initialize()   # Initializes before commands accepted
 
     def print(self, msg):
         print(f"{self.name}: {msg}")
@@ -99,7 +99,7 @@ class Rover():
     def wait_for_command(self):
         start = time.time()
         while (time.time() - start) < MAX_RUNTIME:
-            # Sleep 1 second before trying to check for
+            # Sleep 5 seconds before trying to check for
             # content again
             self.print("Waiting for command...")
             time.sleep(5)
@@ -113,8 +113,9 @@ class Rover():
                 finally:
                     self.print("Finished running command.\n\n")
 
-# Takes the map file, puts it into a 2D array and initializes the rover on a random tile with a random direction
+# Takes the map file, puts it into a 2D array and initializes the rover on a random tile with a random direction.
     def initialize(self):
+# Puts the content of map file into 2D array.
         self.map = []
         with open(self.mapfile, 'r') as m:
             for row in m.readlines():
@@ -126,7 +127,7 @@ class Rover():
                     elif c == '\n':
                         self.map.append(newRow)
             self.map.append(newRow)  #appends final row
-# Rover spawning code
+# Places rover on the map.
         spawnable = 0
         self.direction = random.randint(0,3)
         xcoords =[]
@@ -143,12 +144,14 @@ class Rover():
         self.pos_y = ycoords[spawn_tile]
         self.print_map()
 
-# Helper function to be called by other functions, not explicitly by user
+# Prints the current state of the map, useful for many functions but not always done automatically.
     def print_map(self):
         print("printing map")
         for row in self.map:
             print(*row,sep="")
 
+# Changes the map when called and initializes the rover on said map.
+# map number passed as additional argument in rover command.
     def switch_map(self,mnum):
         if mnum == 1:
             self.mapfile = 'map.txt'
@@ -160,7 +163,7 @@ class Rover():
             self.mapfile = 'map4.txt'
         self.initialize()
 
-# Helper function that changes the character of the rover to indicate direction
+# Helper function that changes the character of the rover to indicate direction on map.
     def roverchar(self):
         icon = ''
         if self.direction == 0:
@@ -173,7 +176,7 @@ class Rover():
             icon = '<'
         return icon
 
-# Prints the results of all the queries
+# Prints the results of all the queries.
     def info(self):
         self.print_pos()
         self.looking()
@@ -184,8 +187,8 @@ class Rover():
         position = [self.pos_x, self.pos_y]
         self.print(f"Position: {position}")
 
-# Shows what the rover is looking at
-    def looking(self):  # tested, works
+# Shows the tile the rover is looking at.
+    def looking(self):
         looking_at = []
         if self.direction == 0:
             self.front = self.map[self.pos_x - 1][self.pos_y]
@@ -205,7 +208,7 @@ class Rover():
             looking_at.append(self.pos_y - 1)
         return looking_at
 
-# Prints the direction that the rover is facing, helper for info()
+# Prints the direction that the rover is facing, helper for info().
     def facing(self):
         print("Rover is facing: ")
         if self.direction == 0:
@@ -217,8 +220,8 @@ class Rover():
         elif self.direction == 3:
             print("Direction - West (3)")
 
-# Self-explanatory, rotates the rover and calls roverchar to change how it looks on the map
-    def turnLeft(self): #added rotation with reworked coordinates and roverchar
+# Self-explanatory, rotates the rover and calls roverchar to change how it looks on the map.
+    def turnLeft(self):
         if self.direction == 0:  #North
             self.direction = 3
             self.map[self.pos_x][self.pos_y] = self.roverchar()
@@ -226,8 +229,8 @@ class Rover():
             self.direction -= 1
             self.map[self.pos_x][self.pos_y] = self.roverchar()
 
-# Self-explanatory, rotates the rover and calls roverchar to change how it looks on the map
-    def turnRight(self):#added rotation with reworked coordinates and roverchar
+# Self-explanatory, rotates the rover and calls roverchar to change how it looks on the map.
+    def turnRight(self):
         if self.direction == 3: #West
             self.direction = 0
             self.map[self.pos_x][self.pos_y] = self.roverchar()
@@ -235,7 +238,8 @@ class Rover():
             self.direction += 1
             self.map[self.pos_x][self.pos_y] = self.roverchar()
 
-# Moves the rover to a new space, has some helper code for the Waypoint function
+# Moves the rover to a new space.
+# If waypoint is true, places a waypoint in the rover's initial position after a movement.
     def move_tile(self):
         self.looking()
         if self.front == ' ':
@@ -277,7 +281,7 @@ class Rover():
         else:
             self.print("Cannot move here, occupied tile")
 
-# Drilling function, turns a depleted D space into an X
+# Drilling function, turns a depleted D space into an X, appends random mineral to inventory.
     def drill(self):
         space = self.looking()
         if self.front != 'D':
@@ -287,7 +291,7 @@ class Rover():
             self.inventory.append(minerals[mineral])
             self.map[space[0]][space[1]] = 'X'
 
-# Shows what the rover has in its inventory
+# Shows the contents of the rover's inventory.
     def print_inv(self):
         print("INVENTORY:")
         iron_count,gold_count,dia_count,nick_count = 0,0,0,0
@@ -305,8 +309,8 @@ class Rover():
         print(f"DIAMOND x {dia_count}")
         print(f"NICKEL x {nick_count}")
 
-# Lets the user know how many D spaces are remaining and show where they are
-    def envScan(self): #tested, works
+# Lets the user know how many D spaces are remaining and their coordinates.
+    def envScan(self):
         total_nodes = 0
         locations = []
         for x in range(len(self.map)):
@@ -321,27 +325,26 @@ class Rover():
         for i in locations:
             print(i)
 
-# Destroys a wall right in front of the rover, can also be used to remove caches and waypoints
-# Used also to prevent rover from getting stuck, can blast your way out of everything
+# Destroys a wall right in front of the rover, can also be used to remove caches and waypoints.
+# Used also to prevent rover from getting stuck.
     def bomb(self):
         target = self.looking()
-        if self.front == 'X' or self.front == 'C' or self.front == 'W': #destroy caches and waypoints if they get in the way
+        if self.front == 'X' or self.front == 'C' or self.front == 'W': #destroy caches and waypoints.
             self.print("BOOM! Target destroyed!")
             self.map[target[0]][target[1]] = ' '
         elif self.front == 'D' or self.front == ' ':
             self.print("Cannot detonate")
 
-# Places a W after a movement to indicate a waypoint
+# Places a W after a movement to indicate a waypoint.
     def waypoint_set(self):
         self.waypoint = True
         for x in range(len(self.map)):
             for y in range(len(self.map[x])):
                 if self.map[x][y] == 'W':
                     self.waypoint = False
-                    #print("Waypoint already set, you can transfer to it if you like")
         self.print("After my next movement, the space immediately behind me will become a waypoint")
 
-# Automatically jump to a waypoint previously set
+# Automatically jump to a waypoint previously set.
     def moveto_waypoint(self):
         for x in range(len(self.map)):
             for y in range(len(self.map[x])):
@@ -351,7 +354,7 @@ class Rover():
                     self.pos_y = y
                     self.map[x][y] = self.roverchar()
 
-# Places a C space into which your items can be dumped
+# Places a C space into which your items can be dumped.
     def cache_make(self):
         spot = self.looking()
         if self.front == ' ':
@@ -359,7 +362,7 @@ class Rover():
         else:
             self.print("Invalid Tile, can only place cache on empty tiles")
 
-# Dumps items into aforementioned cache
+# Dumps items into aforementioned cache.
     def cache_dump(self):
         self.looking()
         if self.front == 'C':
@@ -368,7 +371,7 @@ class Rover():
         else:
             self.print("No cache to dump into")
 
-# Prints 'S' to the left and right of where the rover (Solar Panels)
+# Prints 'S' (Solar Panels) to the left and right of the rover's position provided there is room.
     def charge(self):
         if self.map[self.pos_x][self.pos_y+1] != ' ' or self.map[self.pos_x][self.pos_y-1] != ' ':
             self.print("Not enough room to charge")
@@ -384,8 +387,8 @@ class Rover():
 def main():
     # Initialize the rovers
     rover1 = Rover(ROVER_1)
-    #rover2 = Rover(ROVER_2)
-    my_rovers = [rover1]
+    rover2 = Rover(ROVER_2)
+    my_rovers = [rover1,rover2]
 
     # Run the rovers in parallel
     procs = []
@@ -397,53 +400,6 @@ def main():
     # Wait for the rovers to stop running (after MAX_RUNTIME)
     for p in procs:
         p.join()
-"""
-def main():
-    rover = Rover(name="Rover_1")
-    rover.initialize()
-    cmd = ''
-    while(cmd != 'e'):
-        cmd = input("Enter a key command (postit)")
-        print("====================================")
-        if cmd == 'l':
-            rover.turnLeft()
-            rover.print_map()
-        elif cmd == 'r':
-            rover.turnRight()
-            rover.print_map()
-        elif cmd == 'm':
-            rover.move_tile()
-            rover.print_map()
-        elif cmd == 's':
-            rover.envScan()
-        elif cmd == 'd':
-            rover.drill()
-            rover.print_map()
-        elif cmd == 'b':
-            rover.bomb()
-            rover.print_map()
-        elif cmd == 'w':
-            rover.waypoint_set()
-            rover.print_map()
-        elif cmd == 't':
-            rover.moveto_waypoint()
-            rover.print_map()
-        elif cmd == 'c':
-            rover.cache_make()
-            rover.print_map()
-        elif cmd == 'u':
-            rover.cache_dump()
-            print(cache)
-        elif cmd == 'n':
-            rover.switch_map()
-        elif cmd == 'i':
-            rover.print_inv()
-        elif cmd == 'p':
-            rover.charge()
-            rover.print_map()
-        elif cmd == 'q':
-            rover.info()
-"""
 
 if __name__=="__main__":
     main()
