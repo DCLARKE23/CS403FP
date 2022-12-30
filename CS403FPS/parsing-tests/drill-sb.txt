@@ -3,6 +3,7 @@
     rover . switch_map 4 ;
     while ( n < 4 ) {
         rover . move_tile ;
+        n = n + 1 ;
     }
     rover . bomb ;
     rover . move_tile ;

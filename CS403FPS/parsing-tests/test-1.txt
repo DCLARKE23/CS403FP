@@ -1,5 +1,5 @@
 {
-    int i ;
+    int i = 0 ;
     rover . turnRight ;
     rover . info ;
 }
