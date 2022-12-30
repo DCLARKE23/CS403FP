@@ -1,0 +1,28 @@
+{
+    bool LR = true ;
+    int moves = 0 ;
+    while ( moves < 4 ) {
+        rover . move_tile ;
+        if ( LR = True ) {
+            rover . turnLeft ;
+            rover . move_tile ;
+            rover . print_map ;
+            rover . turnRight ;
+            rover . move_tile ;
+            rover . print_map ;
+        } else {
+            rover . turnRight ;
+            rover . move_tile ;
+            rover . print_map ;
+            rover . turnLeft ;
+            rover . move_tile ;
+            rover . print_map ;
+        }
+        if ( LR = True ) {
+            LR = False ;
+        } else {
+            LR = True ;
+        }
+        moves = moves + 1 ;
+    }
+}

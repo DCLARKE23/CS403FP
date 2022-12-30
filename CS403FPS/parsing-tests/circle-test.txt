@@ -1,0 +1,16 @@
+{
+   int cl = 0 ;
+   int ccl = 0 ;
+   while ( cl < 3 ) {
+        rover . turnRight ;
+        rover . move_tile ;
+        rover . print_map ;
+        cl = cl + 1 ;
+   }
+   while ( ccl < 3 ) {
+        rover . turnLeft ;
+        rover . move_tile ;
+        rover . print_map ;
+        ccl = ccl + 1 ;
+   }
+}

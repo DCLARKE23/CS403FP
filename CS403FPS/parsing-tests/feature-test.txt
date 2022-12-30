@@ -1,0 +1,22 @@
+{
+    rover . print_map ;
+    rover . switch_map 3 ;
+    rover . print_map ;
+    rover . info ;
+    rover . print_pos ;
+    rover . looking ;
+    rover . facing ;
+    rover . turnLeft ;
+    rover . move_tile ;
+    rover . turnRight ;
+    rover . drill ;
+    rover . print_inv ;
+    rover . envScan ;
+    rover . bomb ;
+    rover . waypoint_set ;
+    rover . move_tile ;
+    rover . moveto_waypoint ;
+    rover . cache_make ;
+    rover . cache_dump ;
+    rover . charge ;
+}

@@ -1,0 +1,19 @@
+{
+    int n = 0 ;
+    int r = 0 ;
+    rover . switch_map 4 ;
+    rover . waypoint_set ;
+    rover . move_tile ;
+    rover . print_map ;
+    while ( n < 3 ) {
+        rover . move_tile ;
+        n = n + 1 ;
+    }
+    rover . turnRight ;
+    while ( r < 3 ) {
+        rover . move_tile ;
+        r = n + 1 ;
+    }
+    rover . moveto_waypoint ;
+    rover . print_map ;
+}

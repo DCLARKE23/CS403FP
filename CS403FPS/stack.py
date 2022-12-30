@@ -1,3 +1,5 @@
+from Errors import UndefinedVarError
+
 class stack:
     def __init__(self):
         self.stack = []
@@ -15,21 +17,22 @@ class stack:
             return self.stack[len(self.stack) - 1]
 
     def checkScopes(self, id):
-        i = len(self.stack)
-        while i > 0:
-            if id == self.stack[i]['id']:
+        i = len(self.stack)-1
+        while i >= 0:
+            if id == self.stack[i]:
                 return True
             i -= 1
         return False
 
     def getId(self, id):
-        i = len(self.stack)
-        while i > 0:
-            if id == self.stack[i]['id']:
+        i = len(self.stack)-1
+        while i >= 0:
+            if id in self.stack[i]:
                 return self.stack[i]
             i -= 1
 
-    # -------RAISE ERROR
+        raise UndefinedVarError(id)
+
 
     def assign(self, obj, val):
         id = obj['id']
@@ -38,18 +41,18 @@ class stack:
             val = int(val)
 
         if len(obj['arr']) == 0:
-            i = len(self.stack)
-            while i > 0:
-                if id == self.stack[i]['id']:
-                    self.stack[i]['val'] = val
+            i = len(self.stack)-1
+            while i >= 0:
+                if id == self.stack[i]:
+                    self.stack[i][id]['val'] = val
                 i -= 1
 
         else:
             item = []
-            i = len(self.stack)
-            while i > 0:
-                if id == self.stack[i]['id']:
-                    self.stack[i]['val'] = val
+            i = len(self.stack)-1
+            while i >= 0:
+                if id == self.stack[i]:
+                    self.stack[i][id]['val'] = val
                 i -= 1
 
             for i in obj['arr'][0:-1]:

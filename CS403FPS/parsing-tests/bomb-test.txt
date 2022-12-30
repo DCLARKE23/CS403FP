@@ -1,0 +1,10 @@
+{
+    int n = 0 ;
+    while ( n < 4 ) {
+        rover . move_tile ;
+    }
+    rover . bomb ;
+    rover . move_tile ;
+    rover . info ;
+    rover . print_map ;
+}

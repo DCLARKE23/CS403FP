@@ -1,9 +1,11 @@
 import enum
 from stack import stack
-
-
+from Errors import (TypeMismatchError, UndeclaredVarError, RedefinedVarError)
 SCOPE = stack()
 
+
+class TypeMismatchError(Exception):
+    pass
 
 #added INT, BOOL, CHAR, FLOAT, STRING
 class Vocab(enum.Enum):
@@ -137,6 +139,30 @@ class Node:
         if self.is_nonterminal:
             print(f"{' ' * indent} </ {symbol} >")
 
+    def show(self, level_markers=None):
+        if level_markers is None:
+            level_markers = []
+
+        marker_str = '+--  '
+        empty_str = '     '
+        conn_string = '|    '
+
+        current_level = len(level_markers)
+        mapper = lambda draw: conn_string if draw else empty_str
+        # Map the lambda to an array of booleans which tells us which string to print
+        # We print the conn_string if true because this node is not the last child if it is the case
+        markers = "".join(map(mapper, level_markers[:-1]))
+        markers += marker_str if current_level > 0 else ""
+        print(markers, end='')
+        if not self.is_nonterminal:
+            print(self.token.value)
+        else:
+            print(self.print_val())
+
+        # Call show() recursively on each of its children
+        for i, child in enumerate(self.children):
+            is_last = i == len(self.children) - 1
+            child.show([*level_markers, not is_last])
 
     def print_val(self):
         if not self.is_nonterminal:
@@ -210,8 +236,10 @@ class Node:
         return False
 
     #def raise_type_mismatch_error(self, target):
-        #raise TypeMismatchError()
-
+        raise TypeMismatchError(
+            f"Expected these types {self.get_types()}, "
+            f"but found {target}"
+        )#
 
     def check_semantics(self):
         """Checks the semantics of the tree."""
@@ -230,27 +258,11 @@ class Node:
         for child in self.children:
             child.run()
 
-class TypeMismatchError(Exception):
-    def __init__(self, expected, type_):
-        self.expected = expected
-        self.type_ = type_
+class MinusNode(Node):
+    pass
 
-    def TMerror(self):
-        return f"[TYPE MISMATCH]: expected '{self.expected}' but got '{self.type_}'"
-
-class UndeclaredVarError(Exception):
-    def __init__(self, name):
-        self.name = name
-
-    def UVerror(self):
-        return f"[UNDECLARED VARIABLE]: variable {self.name} is either not defined or outside of scope."
-
-class RedefinedVarError(Exception):
-    def __init__(self, name):
-        self.name = name
-
-    def RDerror(self):
-        return f"[REDEFINED VARIABLE]: variable {self.name} is already defined."
+class NotNode(Node):
+    pass
 
 class ProgramNode(Node):
     def run(self, scope):
@@ -269,85 +281,47 @@ class ProgramNode(Node):
         else:
             print(f"Failed to run program, exited with: {result}")
 
-
-class MinusNode(ProgramNode):
-    def get_types(self):
-        return ("double", "int",)
-
-    def check_scopes(self):
-        global SCOPE
-        self.operand.check_scopes()
-
-    def check_types(self):
-        global SCOPE
-        if not self.match_types(self.operand.get_types()):
-            self.raise_type_mismatch_error(self.operand.get_types())
-
-    def run(self):
-        """ What does this do?
-
-        In this node, you only have one child. We run, the child then
-        multiply it's result by -1. In this case, the child MUST return
-        an int or a double (hint for type checking above), then we
-        return this result.
-
-        Value storage, and retrieval should be done within the scope, e.g.
-        the scope entry for an `int i ; i = 10 ;` should look something
-        like this within the scope entry:
-            SCOPE = {
-                "i": {
-                    "name": "i"
-                    "value": 10
-                }
-            }
-        """
-        return self.operand.run() * -1
-
-
-class NotNode(ProgramNode):
-    pass
-
 class FeatureNode(Node):
     def check_semantics(self):
         pass
 
     def run(self, rover):
         if self.children[0].token.ttype == Vocab.PRINT_MAP:
-            return rover.print_map()
+            rover.print_map()
         elif self.children[0].token.ttype == Vocab.SWITCH_MAP:
-            return rover.switch_map(int(self.children[1].token.value))
+            rover.switch_map(int(self.children[1].token.value))
         elif self.children[0].token.ttype == Vocab.INFO:
-            return rover.info()
+            rover.info()
         elif self.children[0].token.ttype == Vocab.PRINT_POS:
-            return rover.print_pos()
+            rover.print_pos()
         elif self.children[0].token.ttype == Vocab.LOOKING:
-            return rover.looking()
+            rover.looking()
         elif self.children[0].token.ttype == Vocab.FACING:
-            return rover.facing()
+            rover.facing()
         elif self.children[0].token.ttype == Vocab.TURNLEFT:
-            return rover.turnLeft()
+            rover.turnLeft()
         elif self.children[0].token.ttype == Vocab.TURNRIGHT:
-            return rover.turnRight()
+            rover.turnRight()
         elif self.children[0].token.ttype == Vocab.MOVE_TILE:
-            return rover.move_tile()
+            rover.move_tile()
         elif self.children[0].token.ttype == Vocab.DRILL:
-            return rover.drill()
+            rover.drill()
         elif self.children[0].token.ttype == Vocab.PRINT_INV:
-            return rover.print_inv()
+            rover.print_inv()
         elif self.children[0].token.ttype == Vocab.ENVSCAN:
-            return rover.envScan()
+            rover.envScan()
         elif self.children[0].token.ttype == Vocab.BOMB:
-            return rover.bomb()
+            rover.bomb()
         elif self.children[0].token.ttype == Vocab.WAYPOINT_SET:
-            return rover.waypoint_set()
+            rover.waypoint_set()
         elif self.children[0].token.ttype == Vocab.MOVETO_WAYPOINT:
-            return rover.moveto_waypoint()
+            rover.moveto_waypoint()
         elif self.children[0].token.ttype == Vocab.CACHE_MAKE:
-            return rover.cache_make()
+            rover.cache_make()
         elif self.children[0].token.ttype == Vocab.CACHE_DUMP:
-            return rover.cache_dump()
+            rover.cache_dump()
         elif self.children[0].token.ttype == Vocab.CHARGE:
-            return rover.charge()
+            rover.charge()
 
 class FactorNode(Node):
     def semantics(self):
@@ -379,16 +353,16 @@ class FactorNode(Node):
     def run(self, rover):
         def arrIndex(obj):
             arr = obj['val']
-            for i in obj['3dArr'][0:-1]:
+            for i in obj['arr'][0:-1]:
                 arr = arr[i]
-            return arr[obj['3dArr'][-1]]
+            return arr[obj['arr'][-1]]
 
         if isinstance(self.children[0], BoolNode):
             return self.children[0].run(rover)
 
         elif isinstance (self.children[0], LocNode):
             info = self.children[0].run(rover)
-            if len(info['3dArr']) == 0:
+            if len(info['arr']) == 0:
                 value = info['val']
             else:
                 value = arrIndex(info)
@@ -419,7 +393,6 @@ class UnaryNode(Node):
 
             if (operator == '!' and type == 'bool') or (operator == '-' and (type == 'int' or type == 'double')):
                 return info
-
     def run(self, rover):
         if len(self.children) == 1:
             return self.children[0].run(rover)
@@ -444,10 +417,11 @@ class TermclNode(Node):
             
             unaryType = unaryInfo['ttype']
             termclType = termclInfo['ttype']
+
             if unaryType == 'bool' or termclType == 'bool':
                 raise TypeMismatchError('int,double','bool')
-
-            if unaryType != termclType:
+            
+            if (unaryType == 'int' or unaryType == 'double') and  (termclType == 'int' or termclType == 'double'):
                 unaryInfo['ttype'] = 'double'
             return unaryInfo
 
@@ -463,7 +437,7 @@ class TermclNode(Node):
                 unaryVal = term * unaryVal
             else:
                 if unaryVal == 0:
-                    #raise error
+#-------------------raise error
                     print("error")
                 unaryVal = term/unaryVal
 
@@ -480,16 +454,17 @@ class TermNode(Node):
             
         unaryType = unaryInfo['ttype']
         termType = termInfo['ttype']
+
         if unaryType == 'bool' or termType == 'bool':
             raise TypeMismatchError('int,double','bool')
             
-        if unaryType != termType:
+        if (unaryType == 'int' or unaryType == 'double') and  (termType == 'int' or termType == 'double'):
             unaryInfo['ttype'] = 'double'
         return unaryInfo
 
     def run(self, rover):
         unaryObj = self.children[0].run(rover)
-        termObj = self.children[0].run(rover, unaryObj)
+        termObj = self.children[1].run(rover, unaryObj)
         return termObj
 
 
@@ -507,10 +482,11 @@ class ExprclNode(Node):
             
             termTtype = termInfo['ttype']
             exprclType = exprclInfo['ttype']
+
             if termTtype == 'bool' or exprclType == 'bool':
                 raise TypeMismatchError('int,double', 'bool')
             
-            if termTtype != exprclType:
+            if (termTtype == 'int' or termTtype == 'double') and  (exprclType == 'int' or exprclType == 'double'):
                 termInfo['ttype'] = 'double'
             return termInfo
 
@@ -539,16 +515,17 @@ class ExprNode(Node):
             
         termType = exprInfo['ttype']
         exprType = termInfo['ttype']
+
         if termType == 'bool' or exprType == 'bool':
             raise TypeMismatchError('int,double', 'bool')
             
-        if termType != exprType:
+        if (termType == 'int' or termType == 'double') and  (exprType == 'int' or exprType == 'double'):
             termInfo['ttype'] = 'double'
         return termInfo
 
     def run(self, rover):
         termObj = self.children[0].run(rover)
-        exprObj = self.children[0].run(rover, termObj)
+        exprObj = self.children[1].run(rover, termObj)
         return exprObj
 
 class ReltailNode(Node):
@@ -590,7 +567,6 @@ class RelNode(Node):
 
         if exprInfo == 'bool' and reltailInfo == 'bool':
             raise TypeMismatchError('int,double', 'bool')
-
         
         exprInfo['ttype'] = 'bool'
         return exprInfo
@@ -608,8 +584,10 @@ class EqualclNode(Node):
         else:
             relInfo = self.children[1].check_semantics()
             equalclInfo = self.children[2].check_semantics()
-            if equalclInfo is None:
+
+            if equalclInfo == None:
                 return relInfo
+
             if not (
                 relInfo['ttype'] == equalclInfo['ttype'] or
                 (relInfo['ttype'] in ['int','double'] and equalclInfo['ttype'] in ['int','double'])
@@ -644,7 +622,6 @@ class EqualityNode(Node):
         if equalclInfo == None:
             return relInfo
 
-
         if not (
                 relInfo['ttype'] == equalclInfo['ttype'] or
                 (relInfo['ttype'] in ['int', 'double'] and equalclInfo['ttype'] in ['int', 'double'])
@@ -670,8 +647,10 @@ class JoinclNode(Node):
 
             if joinclInfo == None:
                 return equalityInfo
+
             if not (equalityInfo['ttype'] == 'bool' and joinclInfo['ttype'] == 'bool'):
                 raise TypeMismatchError('bool', 'int,double')
+
             return equalityInfo
 
     def run(self, rover, join):
@@ -691,9 +670,11 @@ class JoinNode(Node):
         
         if joinclInfo == None:
             return equalityInfo
+
         if not (equalityInfo['ttype'] == 'bool' and joinclInfo['ttype'] == 'bool'):
             raise TypeMismatchError('bool', 'int,double')
-        return equalityInfo
+
+        return joinclInfo
 
     def run(self, rover):
         equalityObj = self.children[0].run(rover)
@@ -711,8 +692,10 @@ class BoolclNode(Node):
 
             if boolclInfo == None:
                 return joinInfo
+
             if not (joinInfo['ttype'] == 'bool' and boolclInfo['ttype'] == 'bool'):
                 raise TypeMismatchError('bool', 'int,double')
+
             return joinInfo
 
     def run(self, rover, boolcl):
@@ -734,10 +717,10 @@ class BoolNode(Node):
         if boolclInfo == None:
             return joinInfo
 
-
         if not (joinInfo['ttype'] == 'bool' and boolclInfo['ttype'] == 'bool'):
             raise TypeMismatchError('bool', 'int,double')
-        return joinInfo
+
+        return boolclInfo
 
     def run(self, rover):
         joinObj = self.children[0].run(rover)
@@ -754,6 +737,7 @@ class LocclNode(Node):
 
         else:
             index = self.children[0].check_semantcis()
+           
             if index['ttype'] != 'int':
                 raise TypeMismatchError('int', index['ttype'])
 
@@ -779,23 +763,23 @@ class LocNode(Node):
     def check_semantics(self):
         global SCOPE
         id = self.children[0].token.value
-
+        
         if not SCOPE.checkScopes(id):
             raise UndeclaredVarError(id)
 
         symbol = SCOPE.getId(id)
         type = self.children[1].check_semantics()
-        typeDimen = symbol['dimen'] - type['dimen']
-
+        typeDimen = symbol[id]['dimen'] - type['dimen']
 
         if typeDimen < 0:
             raise TypeMismatchError('valid subscript','invalid subscript')
+
         if typeDimen > 0: 
             arr = True
         else:
             arr = False
 
-        return {'ttype': symbol['ttype'],
+        return {'ttype': symbol[id]['ttype'],
                 'arr': arr,
                 'dimen': typeDimen,
                 'val': None}
@@ -808,14 +792,14 @@ class LocNode(Node):
 
         if arr == None:
             return {'id': id,
-                    'val': obj['val'],
-                    'ttype': obj['ttype'],
+                    'val': obj[id]['val'],
+                    'ttype': obj[id]['ttype'],
                     'arr': []}
 
         else:
             return {'id': id,
-                    'val': obj['val'],
-                    'ttype': obj['ttype'],
+                    'val': obj[id]['val'],
+                    'ttype': obj[id]['ttype'],
                     'arr': arr}
 
 class StmtNode(Node):
@@ -840,6 +824,7 @@ class StmtNode(Node):
 
         elif self.children[0].token.value == Vocab.IF or self.children[0].token.value == Vocab.WHILE:
             condition = self.children[1].check_semantics()
+
             if condition['ttype'] != 'bool':
                 raise TypeMismatchError('bool',condition['ttype'])
             
@@ -858,17 +843,18 @@ class StmtNode(Node):
         elif isinstance(self.children, BlockNode):
             self.children[0].run(rover)
 
-        elif self.children[0].token.value == Vocab.ROVER:
+        if self.children[0].token.ttype == Vocab.ROVER:
             self.children[1].run(rover)
 
-        elif self.children[0].token.value == Vocab.IF:
+        elif self.children[0].token.ttype == Vocab.IF:
+
             boolObj = self.children[1].run(rover)
             if boolObj:
                 self.children[2].run(rover)
             elif len(self.children) > 3 and not boolObj:
                 self.children[4].run(rover)
 
-        elif self.children[0].token.value == Vocab.WHILE:
+        elif self.children[0].token.ttype == Vocab.WHILE:
             while True:
                 if not (self.children[1].run(rover)):
                     break
@@ -892,6 +878,7 @@ class TypeclNode(Node):
                     'arr': False,
                     'dimen': 0,
                     'val': None}
+
         else:
             type = self.children[1].check_semantics()
             type['dimen'] = type['dimen'] + 1
@@ -969,4 +956,5 @@ class BlockNode(Node):
 
         self.children[0].run(rover)
         self.children[1].run(rover)
+
         SCOPE.pop()

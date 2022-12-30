@@ -1,0 +1,15 @@
+{
+    int n = 0 ;
+    rover . switch_map 4 ;
+    while ( n < 4 ) {
+        rover . move_tile ;
+    }
+    rover . bomb ;
+    rover . move_tile ;
+    rover . drill ;
+    rover . bomb ;
+    rover . cache_make ;
+    rover . print_inv ;
+    rover . cache_dump ;
+    rover . print_map ;
+}

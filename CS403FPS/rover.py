@@ -3,10 +3,15 @@ import pathlib
 import time
 import traceback
 import random
-import parserf
+import parser1 as parser
 
 
+class RunTimeError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
 
+    def __str__(self):
+        return f'[RUNTIME ERROR]: {self.msg}'
 
 # The maximum amount of time that the rover can run in seconds
 MAX_RUNTIME = 36000
@@ -78,8 +83,8 @@ class Rover():
         print(f"{self.name}: {msg}")
 
     def parse_and_execute_cmd(self, command):
-        self.print(f"Running command: {command}")
-        tree = parserf.get_parse_tree(command)
+        self.print(f"Running command: \n{command}")
+        tree = parser.get_parse_tree(command)
 
         for i in tree.children:
             i.check_semantics()
@@ -87,8 +92,9 @@ class Rover():
         for i in tree.children:
             try:
                 i.run(self)
+                print(i)
             except TypeError as te:
-                raise RuntimeError(te.args)
+                raise RunTimeError(te.args)
 
     def wait_for_command(self):
         start = time.time()
@@ -96,7 +102,7 @@ class Rover():
             # Sleep 1 second before trying to check for
             # content again
             self.print("Waiting for command...")
-            time.sleep(60)
+            time.sleep(5)
             if get_command(self.name):
                 self.print("Found a command...")
                 try:
@@ -139,6 +145,7 @@ class Rover():
 
 # Helper function to be called by other functions, not explicitly by user
     def print_map(self):
+        print("printing map")
         for row in self.map:
             print(*row,sep="")
 
@@ -149,11 +156,9 @@ class Rover():
             self.mapfile = 'map2.txt'
         elif mnum == 3:
             self.mapfile = 'map3.txt'
+        elif mnum == 4:
+            self.mapfile = 'map4.txt'
         self.initialize()
-# Needs to be fixed to work with project
-#     def switch_map(self):  # tested, works for now, although might not work how intended with program
-#         self.mapfile = input("Enter the filename of another map file")
-#         self.initialize()
 
 # Helper function that changes the character of the rover to indicate direction
     def roverchar(self):
@@ -379,19 +384,15 @@ class Rover():
 def main():
     # Initialize the rovers
     rover1 = Rover(ROVER_1)
-    rover2 = Rover(ROVER_2)
-    my_rovers = [rover1, rover2]
+    #rover2 = Rover(ROVER_2)
+    my_rovers = [rover1]
+
     # Run the rovers in parallel
     procs = []
-
     for rover in my_rovers:
-        #start = multiprocessing.Process(target=rover.initialize, args=())
-        #start.start()
-        #procs.append(start)
         p = multiprocessing.Process(target=rover.wait_for_command, args=())
         p.start()
         procs.append(p)
-
 
     # Wait for the rovers to stop running (after MAX_RUNTIME)
     for p in procs:

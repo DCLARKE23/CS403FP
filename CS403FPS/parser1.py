@@ -103,10 +103,8 @@ from parser_components import (
     DeclsNode,
     BlockNode,
     ProgramNode,
-    MinusNode,
     Node,
     NonTerminals,
-    NotNode,
     Token,
     Vocab,
 )
@@ -213,7 +211,6 @@ def Feature():
     current = FeatureNode(NonTerminals.FEATURE)
     if match_cases(
         Vocab.PRINT_MAP,
-        Vocab.SWITCH_MAP,
         Vocab.INFO,
         Vocab.PRINT_POS,
         Vocab.LOOKING,
@@ -237,12 +234,13 @@ def Feature():
         current.add_child(Node(CURR_TOKEN))
         CURR_TOKEN = get_token()
         current.add_child(Node(CURR_TOKEN))
-        must_be(Vocab.INT)
+        must_be(Vocab.NUM)
     else:
         raise UnexpectedTokenError(
             f"Unexpected token found: {CURR_TOKEN.value}, "
             f"expected: rover feature."
         )
+    return current
 
 # <factor>   ::= ( <bool> )
 #              | <loc>
@@ -280,22 +278,12 @@ def Unary():
         Vocab.NOT,
         Vocab.MINUS,
     ):
-        if match_cases(Vocab.NOT):
-            n = NotNode(CURR_TOKEN)
-        else:
-            n = MinusNode(CURR_TOKEN)
-        current.add_child(n)
-        current.operation_node = n
-
+        current.add_child(Node(CURR_TOKEN))
         CURR_TOKEN = get_token()
 
-        unode = Unary()
-        current.add_child(unode)
-        current.operand = unode
+        current.add_child(Unary())
     else:
-        fnode = Factor()
-        current.add_child(fnode)
-        current.operand = fnode
+        current.add_child(Factor())
     return current
 
 
@@ -501,7 +489,6 @@ def Stmt():
     elif match_cases(Vocab.ROVER):
         current.add_child(Node(CURR_TOKEN))
         CURR_TOKEN = get_token()
-
         must_be(Vocab.DOT)
         current.add_child(Feature())
         must_be(Vocab.SEMICOLON)
@@ -578,7 +565,7 @@ def Decls():
         Vocab.OPEN_BRACE,
         Vocab.ID,
         Vocab.CLOSE_BRACE,
-        Vocab.ROVER,
+        Vocab.ROVER
     ):
         pass
     else:
@@ -599,6 +586,7 @@ def Block():
 
 # <program>  ::= <block>
 def Program():
+    print("in parsr program")
     current = ProgramNode(NonTerminals.PROGRAM)
     current.add_child(Block())
     return current
