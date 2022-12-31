@@ -87,7 +87,7 @@ class Rover():
         tree = parser.get_parse_tree(command)
 
         for i in tree.children:
-            i.semantics()
+            i.check_semantics()
 
         for i in tree.children:
             try:
